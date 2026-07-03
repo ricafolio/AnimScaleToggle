@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Anim Scale Toggle</string>
+    <string name="app_name">AnimScaleToggle</string>
     <string name="tile_label">Animations</string>
     <string name="shortcut_off_short">Anim Off</string>
     <string name="shortcut_off_long">Disable animations</string>
