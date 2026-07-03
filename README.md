@@ -28,9 +28,9 @@ Android normally ties animation scales to the Developer Options menu. When you t
 1. **Clone or download this repo.** Open the project folder (`AnimScaleToggle/`) in Android Studio. Let Gradle sync and build the project.
 2. **Install the app** to your device (USB debugging must be temporarily enabled for this step).
 3. **Set up ADB on your computer:**
-* Download the [Android SDK Platform-Tools](https://www.google.com/search?q=https://developer.android.com/tools/releases/platform-tools) for your operating system.
-* Extract the ZIP file to a dedicated folder on your machine (e.g., `C:\platform-tools`).
-* Open your terminal (Command Prompt, PowerShell, or macOS/Linux Terminal) and navigate to that extracted folder.
+    * Download the [Android SDK Platform-Tools](https://www.google.com/search?q=https://developer.android.com/tools/releases/platform-tools) for your operating system.
+    * Extract the ZIP file to a dedicated folder on your machine (e.g., `C:\platform-tools`).
+    * Open your terminal (Command Prompt, PowerShell, or macOS/Linux Terminal) and navigate to that extracted folder.
 
 4. **Grant the permission.** With your device still connected and USB debugging on, run this one-time command from your terminal:
 ```bash
@@ -38,6 +38,7 @@ adb shell pm grant com.ricafolio.animscaletoggle android.permission.WRITE_SECURE
 ```
 
 *(Note for PowerShell users: You may need to prefix the command with `.\`, like `.\adb shell...`)*
+
 5. **Turn Developer Options back off.** The permission grant is unaffected, and your secure apps will now load normally.
 6. **Configure your layout.** Add the Quick Settings tile, pin the widget, or pin a shortcut. Open the app once to set your preferred "off" scale.
 
