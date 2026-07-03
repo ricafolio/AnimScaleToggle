@@ -21,6 +21,13 @@ import androidx.appcompat.app.AppCompatActivity
 /**
  * Plain-View UI (no Compose dependency needed for something this small).
  * Full black background throughout — no light containers anywhere.
+ *
+ * Layout order:
+ *   Heading -> status -> toggle button
+ *   Step 1: grant permission
+ *   Customize your "enabled" speed
+ *   Step 2: turn Developer Options back off (with live detection)
+ *   Ways to trigger the toggle (last)
  */
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +44,8 @@ class MainActivity : AppCompatActivity() {
     private val colorCardBg = Color.parseColor("#111111")
     private val colorCardBorder = Color.parseColor("#333333")
 
+    private val sectionGap = 52
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(48, 48, 48, 64)
+            setPadding(48, 60, 48, 64)
             setBackgroundColor(colorBg)
         }
 
@@ -53,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             textSize = 22f
             gravity = Gravity.CENTER
             setTextColor(colorWhite)
-            setPadding(0, 0, 0, 12)
+            setPadding(0, 32, 0, 12)
         }
 
         fun body(text: String, topPad: Int = 0, color: Int = colorMuted) = TextView(this).apply {
@@ -63,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, topPad, 0, 0)
         }
 
-        fun sectionTitle(text: String, topPad: Int = 40) = TextView(this).apply {
+        fun sectionTitle(text: String, topPad: Int = 0) = TextView(this).apply {
             this.text = text
             textSize = 15f
             setTypeface(typeface, Typeface.BOLD)
@@ -71,18 +80,19 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, topPad, 0, 4)
         }
 
-        fun divider(topMargin: Int = 40) = View(this).apply {
+        fun divider(yMargin: Int = sectionGap) = View(this).apply {
             setBackgroundColor(colorDivider)
-        }.let {
-            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2).apply { this.topMargin = topMargin }
-                .let { params -> it.layoutParams = params; it }
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2).apply {
+                this.topMargin = yMargin
+                this.bottomMargin = yMargin
+            }
         }
 
         fun circleBadge(number: String): TextView {
-            val sizePx = (28 * resources.displayMetrics.density).toInt()
+            val sizePx = (24 * resources.displayMetrics.density).toInt()
             return TextView(this).apply {
                 text = number
-                textSize = 14f
+                textSize = 12f
                 setTypeface(typeface, Typeface.BOLD)
                 setTextColor(Color.BLACK)
                 gravity = Gravity.CENTER
@@ -94,7 +104,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Title + one-line purpose
+        fun stepHeaderRow(number: String, title: String): LinearLayout {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, 0, 0, 16)
+            }
+            row.addView(circleBadge(number))
+            row.addView(TextView(this).apply {
+                text = title
+                textSize = 15f
+                setTypeface(typeface, Typeface.BOLD)
+                setTextColor(colorWhite)
+                setPadding(20, 0, 0, 0)
+            })
+            return row
+        }
+
+        // ---------- Heading + purpose ----------
         root.addView(heading(getString(R.string.app_name)), lp)
         root.addView(
             body(
@@ -102,19 +129,20 @@ class MainActivity : AppCompatActivity() {
                     "without touching Developer Options, so it won't reset " +
                     "every time you flip USB debugging on and off."
             ),
-            lp
+            lp.apply { bottomMargin = 6 }
         )
 
-        // Live status — no background container, just colored text
+        // ---------- Live status ----------
         statusText = TextView(this).apply {
             textSize = 17f
             gravity = Gravity.CENTER
             setTypeface(typeface, Typeface.BOLD)
         }
-        root.addView(statusText, lp.apply { topMargin = 60 })
+        root.addView(statusText, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = 32; bottomMargin = 24 })
 
         val toggleBtn = Button(this).apply {
             text = "Toggle animations now"
+            gravity = Gravity.CENTER
             setOnClickListener {
                 try {
                     AnimScale.toggle(this@MainActivity)
@@ -124,25 +152,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        root.addView(toggleBtn, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = 24 })
+        root.addView(toggleBtn, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = 12 })
 
-        root.addView(divider(40))
+        root.addView(divider())
 
-        // Step 1 (the only real step): grant permission, with circle badge
-        val stepRow = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(0, 60, 0, 60)
-        }
-        stepRow.addView(circleBadge("1"))
-        stepRow.addView(TextView(this).apply {
-            text = "Grant the permission (one time only)"
-            textSize = 15f
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(colorWhite)
-            setPadding(20, 0, 0, 0)
-        })
-        root.addView(stepRow, lp)
+        // ---------- Step 1: grant permission ----------
+        root.addView(stepHeaderRow("1", "Grant the permission (one time only)"), lp.apply { topMargin = sectionGap })
+
+        root.addView(
+            body("This grant sticks even after Developer Options is turned off. You only need to do this once, unless you reinstall the app.", topPad = 8),
+            lp
+        )
 
         root.addView(
             body("Connect via USB with debugging on, then run this on your computer:", topPad = 8),
@@ -162,7 +182,7 @@ class MainActivity : AppCompatActivity() {
                 cornerRadius = 12f
             }
         }
-        root.addView(adbText, lp.apply { topMargin = 8 })
+        root.addView(adbText, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = 18 })
 
         val copyBtn = Button(this).apply {
             text = "Copy command"
@@ -172,76 +192,22 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
             }
         }
-        root.addView(copyBtn, lp)
+        root.addView(copyBtn, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            gravity = Gravity.START
+            leftMargin = 0
+        })
+
+        root.addView(divider())
+
+        // ---------- Step 2: customize speed ----------
+        root.addView(stepHeaderRow("2", "Customize your \"enabled\" speed"), lp.apply { topMargin = sectionGap })
         root.addView(
-            body("This grant sticks even after Developer Options is turned off again — you only need to do this once, unless you reinstall the app.", topPad = 8),
+            body("One value applies to all three animation settings. Default is 0.5x — most people find anything much lower starts to feel choppy.", topPad = 8),
             lp
         )
 
-        root.addView(divider(40))
-
-        // Non-numbered suggestions below — spaced apart, no "step" language
-        val stepRow2 = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(0, 60, 0, 60)
-        }
-        stepRow2.addView(circleBadge("2"))
-        stepRow2.addView(TextView(this).apply {
-            text = "Turn Developer Options back off"
-            textSize = 15f
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(colorWhite)
-            setPadding(20, 0, 0, 0)
-        })
-        root.addView(stepRow2, lp)
-
-        devOptionsText = TextView(this).apply {
-            textSize = 14f
-            setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, 12, 0, 0)
-        }
-        root.addView(devOptionsText, lp)
-        root.addView(body("Safe to turn off right away — this app's permission isn't tied to that toggle.", topPad = 6), lp)
-
-        root.addView(divider(40))
-
-        root.addView(sectionTitle("Ways to trigger the toggle", topPad = 60), lp)
-        val waysCard = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(24, 16, 24, 20)
-            background = android.graphics.drawable.GradientDrawable().apply {
-                setColor(colorCardBg)
-                setStroke(2, colorCardBorder)
-                cornerRadius = 20f
-            }
-        }
-        fun wayRow(title: String, detail: String) {
-            waysCard.addView(TextView(this).apply {
-                text = title
-                textSize = 14f
-                setTypeface(typeface, Typeface.BOLD)
-                setTextColor(colorWhite)
-                setPadding(0, if (waysCard.childCount == 0) 0 else 16, 0, 0)
-            })
-            waysCard.addView(TextView(this).apply {
-                text = detail
-                textSize = 13f
-                setTextColor(colorMuted)
-                setPadding(0, 2, 0, 0)
-            })
-        }
-        wayRow("Quick Settings tile", "Swipe down twice → edit tiles → add \"${getString(R.string.tile_label)}\". Shows current state in the tile itself.")
-        wayRow("Home screen widget", "Long-press your home screen → Widgets → \"${getString(R.string.app_name)}\". Changes color when active.")
-        wayRow("Pinned app shortcuts", "Long-press this app's launcher icon → pin Off / On / Toggle individually.")
-        wayRow("This screen", "Just come back here anytime and tap the button above.")
-        root.addView(waysCard, lp.apply { topMargin = 8 })
-
-        root.addView(divider(40))
-
-        root.addView(sectionTitle("Customize your \"enabled\" speed", topPad = 60), lp)
         root.addView(
-            body("One value applies to all three animation settings. Default is 0.5x — most people find anything much lower starts to feel choppy."),
+            body("Applies immediately to the button above, tile, widget, and shortcuts.", topPad = 8),
             lp
         )
 
@@ -250,9 +216,15 @@ class MainActivity : AppCompatActivity() {
             hint = "e.g. 0.5"
             setHintTextColor(colorMuted)
             setTextColor(colorWhite)
+            setPadding(24, 24, 24, 24)
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(colorCardBg)
+                setStroke(2, colorCardBorder)
+                cornerRadius = 12f
+            }
             setText(AnimScale.getOffScale(this@MainActivity).toString())
         }
-        root.addView(scaleInput, lp.apply { topMargin = 8 })
+        root.addView(scaleInput, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = 18 })
 
         val saveScaleBtn = Button(this).apply {
             text = "Save value"
@@ -267,11 +239,65 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        root.addView(saveScaleBtn, lp)
-        root.addView(
-            body("Applies immediately to the button above, tile, widget, and shortcuts — no rebuild needed.", topPad = 8),
-            lp
-        )
+        root.addView(saveScaleBtn, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            gravity = Gravity.START
+            leftMargin = 0
+        })
+
+        root.addView(divider())
+
+        // ---------- Step 3: turn dev options back off ----------
+        root.addView(stepHeaderRow("3", "Turn Developer Options back off"), lp.apply { topMargin = sectionGap })
+
+        devOptionsText = TextView(this).apply {
+            textSize = 14f
+            setTypeface(typeface, Typeface.BOLD)
+            setPadding(0, 12, 0, 0)
+        }
+        root.addView(devOptionsText, lp)
+        root.addView(body("Safe to turn off right away — this app's permission isn't tied to that toggle.", topPad = 6), lp)
+
+        root.addView(divider())
+
+        // ---------- Ways to trigger the toggle (last) ----------
+        root.addView(heading("That's it!"), lp.apply { topMargin = sectionGap })
+
+        root.addView(sectionTitle("You can now use these ways to toggle speed").apply {
+            gravity = Gravity.CENTER
+        }, lp.apply {
+            topMargin = sectionGap
+            bottomMargin = 16
+        })
+
+        val waysCard = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 32, 24, 32)
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(colorCardBg)
+                setStroke(2, colorCardBorder)
+                cornerRadius = 20f
+            }
+        }
+        fun wayRow(title: String, detail: String) {
+            waysCard.addView(TextView(this).apply {
+                text = title
+                textSize = 14f
+                setTypeface(typeface, Typeface.BOLD)
+                setTextColor(colorWhite)
+                setPadding(12, if (waysCard.childCount == 0) 0 else 16, 12, 0)
+            })
+            waysCard.addView(TextView(this).apply {
+                text = detail
+                textSize = 13f
+                setTextColor(colorMuted)
+                setPadding(12, 2, 12, 0)
+            })
+        }
+        wayRow("Home screen widget", "· Long-press your home screen → Widgets → \"${getString(R.string.app_name)}\". Place the button anywhere convenient in your home screen.")
+        wayRow("Pinned app shortcuts", "· Long-press this app's launcher icon → pin Off / On / Toggle individually.")
+        wayRow("Quick Settings tile", "· Swipe down twice → edit tiles → add \"${getString(R.string.tile_label)}\". Shows current state in the tile itself.")
+        wayRow("This screen", "· Just come back here anytime and tap the button above!")
+        root.addView(waysCard, lp.apply { topMargin = 8 })
 
         val scroll = ScrollView(this).apply { setBackgroundColor(colorBg) }
         scroll.addView(root)
@@ -301,7 +327,7 @@ class MainActivity : AppCompatActivity() {
         val offScale = AnimScale.getOffScale(this)
 
         val (label, textColor) = when (off) {
-            true -> "Enabled — ${offScale}x animations" to colorGreen
+            true -> "Enabled — ${offScale}x speed" to colorGreen
             false -> "Disabled — 1x (default)" to colorNeutral
             null -> "Unknown — permission missing" to colorRed
         }
