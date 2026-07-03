@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="anim_off"
+        android:enabled="true"
+        android:icon="@drawable/ic_tile"
+        android:shortcutShortLabel="@string/shortcut_off_short"
+        android:shortcutLongLabel="@string/shortcut_off_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.ricafolio.animscaletoggle"
+            android:targetClass="com.ricafolio.animscaletoggle.SetOffActivity" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="anim_on"
+        android:enabled="true"
+        android:icon="@drawable/ic_tile"
+        android:shortcutShortLabel="@string/shortcut_on_short"
+        android:shortcutLongLabel="@string/shortcut_on_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.ricafolio.animscaletoggle"
+            android:targetClass="com.ricafolio.animscaletoggle.SetOnActivity" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="anim_toggle"
+        android:enabled="true"
+        android:icon="@drawable/ic_tile"
+        android:shortcutShortLabel="@string/shortcut_toggle_short"
+        android:shortcutLongLabel="@string/shortcut_toggle_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.ricafolio.animscaletoggle"
+            android:targetClass="com.ricafolio.animscaletoggle.QuickToggleActivity" />
+    </shortcut>
+</shortcuts>

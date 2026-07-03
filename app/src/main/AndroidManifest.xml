@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Granted via ADB: pm grant com.ricafolio.animscaletoggle android.permission.WRITE_SECURE_SETTINGS -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AnimScaleToggle"
+        android:supportsRtl="true">
+
+        <!-- Main app: shows status, lets you toggle, has a "copy grant command" helper -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+        <!-- No-UI activity: toggles scale and finishes immediately. Bound to shortcuts / tile taps that need an Activity context. -->
+        <activity
+            android:name=".QuickToggleActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
+        <!-- Explicit "set OFF" and "set ON" activities, used by pinned launcher shortcuts -->
+        <activity
+            android:name=".SetOffActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
+        <activity
+            android:name=".SetOnActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
+        <!-- Home screen widget: 1x1 button-style toggle -->
+        <receiver
+            android:name=".AnimScaleWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.ricafolio.animscaletoggle.WIDGET_TOGGLE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+
+        <!-- Quick Settings Tile: swipe down, tap, toggles animation scale -->
+        <service
+            android:name=".AnimScaleTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+    </application>
+</manifest>
