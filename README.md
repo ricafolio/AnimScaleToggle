@@ -1,10 +1,12 @@
-# Anim Scale Toggle — Change Animation Scale Without Developer Options (Android)
+# AnimScaleToggle App — Change Animation Scale Without Developer Options (Android)
 ![Static Badge](https://img.shields.io/badge/Built_with_Claude-665c4f?style=for-the-badge)
 ![Static Badge](https://img.shields.io/badge/—_vibe_coded_with_love_<3-ff0000?style=for-the-badge)
 
-A small Android Studio project that lets you change your **window animation scale**, **transition animation scale**, and **animator duration scale** with one tap—without needing Developer Options turned on. Built specifically for the case where a **banking app refuses to load unless Developer Options is disabled**, but you still want fast or disabled animations the rest of the time.
+A small project that lets you change your **window animation scale**, **transition animation scale**, and **animator duration scale** with one tap—without needing Developer Options turned on. 
 
-> **This is an Android Studio source code project, not an APK.** There is no pre-built install file here. You will need to open this folder in Android Studio, build it, and install it to your own device. See [Setup](https://www.google.com/search?q=%23setup) below.
+Built specifically to eliminate the frustration of using broad tweaking apps like SystemUI Tuner just to fix one setting. When turning off Developer Options for a banking app silently resets your animation speeds, this app bypasses the tedious, multi-step menu diving and lets you instantly restore your preferred speeds using dedicated one-tap shortcuts and widgets.
+
+> **NOTE: This is an Android Studio source code project, not an APK.** There is no pre-built install file here. You will need to open this folder in Android Studio, build it, and install it to your own device. See [Setup](https://www.google.com/search?q=%23setup) below.
 
 ## Features
 
